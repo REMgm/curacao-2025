@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Curacao 2025 - Family Trip Planner</title>
+<style>
+  :root {
+    --klm-blue: #00a1de;
+    --klm-dark: #003145;
+    --booking-blue: #003580;
+    --booking-yellow: #febb02;
+    --accent-green: #008009;
+    --accent-orange: #ff6b35;
+    --bg-light: #f5f7fa;
+    --card-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    --card-hover: 0 4px 24px rgba(0,0,0,0.14);
+    --radius: 12px;
+    --star-gold: #febb02;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg-light);
+    color: #1a1a2e;
+    line-height: 1.5;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, var(--klm-dark) 0%, var(--booking-blue) 100%);
+    color: white;
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .header-brand svg { width: 32px; height: 32px; }
+  .header-brand h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+  .header-brand span { font-size: 13px; opacity: 0.8; font-weight: 400; }
+  .header-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 13px;
+  }
+  .header-meta .badge {
+    background: rgba(255,255,255,0.15);
+    padding: 6px 14px;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .header-meta .saved-count {
+    background: var(--booking-yellow);
+    color: var(--klm-dark);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .header-meta .saved-count:hover { transform: scale(1.05); }
+
+  /* TRIP SUMMARY BAR */
+  .trip-bar {
+    background: rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding: 12px 24px;
+  }
+  .trip-bar-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    gap: 32px;
+    font-size: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .trip-bar-inner .item { display: flex; align-items: center; gap: 6px; }
+  .trip-bar-inner .item strong { color: var(--booking-yellow); }
+
+  /* BUDGET TRACKER */
+  .budget-section {
+    max-width: 1400px;
+    margin: 20px auto;
+    padding: 0 24px;
+  }
+  .budget-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .budget-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+  }
+  .budget-card h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #666; margin-bottom: 8px; }
+  .budget-card .amount { font-size: 28px; font-weight: 800; color: var(--klm-dark); }
+  .budget-card .amount small { font-size: 14px; color: #999; font-weight: 400; }
+  .budget-bar {
+    height: 6px;
+    background: #e8ecf1;
+    border-radius: 3px;
+    margin-top: 12px;
+    overflow: hidden;
+  }
+  .budget-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s ease;
+  }
+  .budget-bar-fill.green { background: var(--accent-green); }
+  .budget-bar-fill.orange { background: var(--accent-orange); }
+  .budget-bar-fill.red { background: #e74c3c; }
+
+  /* TABS */
+  .tabs-container {
+    max-width: 1400px;
+    margin: 24px auto 0;
+    padding: 0 24px;
+  }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: white;
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 4px;
+    box-shadow: var(--card-shadow);
+  }
+  .tab {
+    flex: 1;
+    padding: 14px 20px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab:hover { background: var(--bg-light); color: var(--klm-dark); }
+  .tab.active { background: var(--klm-blue); color: white; }
+  .tab .count {
+    display: inline-block;
+    background: rgba(0,0,0,0.1);
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-left: 6px;
+  }
+  .tab.active .count { background: rgba(255,255,255,0.25); }
+
+  /* CONTENT */
+  .content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px 40px;
+  }
+  .tab-content {
+    display: none;
+    background: white;
+    border-radius: 0 0 var(--radius) var(--radius);
+    box-shadow: var(--card-shadow);
+    padding: 24px;
+  }
+  .tab-content.active { display: block; }
+
+  /* SECTION HEADER */
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .section-header h2 { font-size: 20px; font-weight: 700; color: var(--klm-dark); }
+  .section-header .filter-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    background: white;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .pill:hover, .pill.active { border-color: var(--klm-blue); color: var(--klm-blue); background: #f0f9ff; }
+
+  /* FLIGHT CARDS */
+  .flight-card {
+    border: 1px solid #e8ecf1;
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 20px;
+    align-items: center;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .flight-card:hover { box-shadow: var(--card-hover); border-color: var(--klm-blue); }
+  .flight-card.saved { border-color: var(--star-gold); background: #fffdf5; }
+  .flight-info { display: flex; flex-direction: column; gap: 12px; }
+  .flight-route {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .flight-time { font-size: 20px; font-weight: 700; }
+  .flight-airport { font-size: 12px; color: #666; }
+  .flight-duration {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 100px;
+  }
+  .flight-duration span { font-size: 12px; color: #666; }
+  .flight-duration .line {
+    width: 100%;
+    height: 2px;
+    background: #ddd;
+    position: relative;
+    margin: 4px 0;
+  }
+  .flight-duration .line::after {
+    content: '';
+    position: absolute;
+    right: -3px;
+    top: -3px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--klm-blue);
+  }
+  .flight-airline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #666;
+  }
+  .airline-logo {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 10px;
+    color: white;
+  }
+  .airline-klm { background: var(--klm-blue); }
+  .airline-tui { background: #d40e14; }
+  .airline-corendon { background: #ff6600; }
+  .flight-price-box {
+    text-align: right;
+    min-width: 140px;
+  }
+  .flight-price-box .pp { font-size: 12px; color: #666; }
+  .flight-price-box .price { font-size: 26px; font-weight: 800; color: var(--accent-green); }
+  .flight-price-box .total { font-size: 13px; color: #888; }
+  .flight-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 44px;
+  }
+  .star-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    transition: all 0.2s;
+  }
+  .star-btn:hover { border-color: var(--star-gold); transform: scale(1.1); }
+  .star-btn.saved { border-color: var(--star-gold); background: var(--star-gold); }
+
+  /* DEAL TAG */
+  .deal-tag {
+    position: absolute;
+    top: -1px;
+    left: 20px;
+    background: var(--accent-green);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 0 0 6px 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ACCOMMODATION CARDS */
+  .acc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+  }
+  .acc-card {
+    border: 1px solid #e8ecf1;
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .acc-card:hover { box-shadow: var(--card-hover); transform: translateY(-2px); }
+  .acc-card.saved { border-color: var(--star-gold); }
+  .acc-card-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background: #e8ecf1;
+  }
+  .acc-card-body { padding: 16px; }
+  .acc-card-body h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--klm-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .acc-card-location { font-size: 13px; color: #666; margin-bottom: 8px; }
+  .acc-card-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .rating-badge {
+    background: var(--booking-blue);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px 6px 6px 0;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .rating-text { font-size: 13px; color: #666; }
+  .acc-amenities {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .amenity-tag {
+    font-size: 11px;
+    padding: 3px 8px;
+    background: var(--bg-light);
+    border-radius: 4px;
+    color: #555;
+  }
+  .acc-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f0;
+  }
+  .acc-price-info .per-night { font-size: 12px; color: #666; }
+  .acc-price-info .price { font-size: 22px; font-weight: 800; color: var(--accent-green); }
+  .acc-price-info .total { font-size: 12px; color: #888; }
+  .acc-source {
+    font-size: 12px;
+    padding: 4px 10px;
+    background: var(--bg-light);
+    border-radius: 4px;
+    color: #555;
+    text-decoration: none;
+  }
+  .acc-star-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(4px);
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .acc-star-btn:hover { transform: scale(1.15); }
+  .acc-star-btn.saved { background: var(--star-gold); }
+  .budget-tag {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+  }
+  .budget-tag.within { background: var(--accent-green); }
+  .budget-tag.over { background: var(--accent-orange); }
+
+  /* SAVED PANEL */
+  .saved-panel {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 420px;
+    max-width: 100vw;
+    height: 100vh;
+    background: white;
+    box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+    z-index: 200;
+    overflow-y: auto;
+  }
+  .saved-panel.open { display: block; }
+  .saved-panel-header {
+    position: sticky;
+    top: 0;
+    background: var(--klm-dark);
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .saved-panel-header h2 { font-size: 18px; }
+  .saved-panel-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  .saved-panel-body { padding: 16px; }
+  .saved-item {
+    padding: 12px;
+    border: 1px solid #e8ecf1;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .saved-item-info h4 { font-size: 14px; font-weight: 600; }
+  .saved-item-info p { font-size: 12px; color: #666; }
+  .saved-item-remove {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #999;
+    padding: 4px;
+  }
+  .saved-item-remove:hover { color: #e74c3c; }
+  .saved-total {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    border-top: 2px solid var(--klm-dark);
+    padding: 16px 20px;
+  }
+  .saved-total-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+  .saved-total-line.grand {
+    font-size: 18px;
+    font-weight: 800;
+    padding-top: 8px;
+    border-top: 1px solid #eee;
+  }
+  .overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    z-index: 150;
+  }
+  .overlay.open { display: block; }
+
+  /* LAST UPDATED */
+  .last-updated {
+    text-align: center;
+    font-size: 12px;
+    color: #999;
+    padding: 20px 0;
+  }
+
+  /* VIEW LINK */
+  .view-link {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--klm-blue);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .view-link:hover { text-decoration: underline; }
+
+  /* LOADING PULSE */
+  .pulse {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    animation: pulse 1.5s ease-in-out infinite;
+    margin-right: 6px;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .flight-card { grid-template-columns: 1fr; }
+    .flight-price-box { text-align: left; }
+    .acc-grid { grid-template-columns: 1fr; }
+    .trip-bar-inner { gap: 12px; }
+    .header-top { flex-direction: column; gap: 12px; }
+    .saved-panel { width: 100vw; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div class="header-brand">
+      <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="white" stroke-width="2"/><path d="M10 16h12M16 10v12" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M22 12l-6 4-6-4" stroke="#febb02" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <div>
+        <h1>Curacao 2025</h1>
+        <span>Family Trip Planner</span>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="badge">5 travelers</div>
+      <div class="badge"><span class="pulse"></span>Live research</div>
+      <div class="saved-count" onclick="toggleSavedPanel()" id="savedCountBtn">Saved: <span id="savedCount">0</span></div>
+    </div>
+  </div>
+  <div class="trip-bar">
+    <div class="trip-bar-inner">
+      <div class="item">Departure <strong>AMS</strong> Amsterdam</div>
+      <div class="item">Destination <strong>CUR</strong> Curacao</div>
+      <div class="item">Dates <strong>Apr 15/16 &ndash; Apr 26</strong></div>
+      <div class="item">Guests <strong>5 pax</strong></div>
+      <div class="item">Budget <strong>EUR 8,000</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- BUDGET TRACKER -->
+<div class="budget-section">
+  <div class="budget-cards">
+    <div class="budget-card">
+      <h3>Flights Budget</h3>
+      <div class="amount">EUR 6,000 <small>/ EUR 1,200 pp</small></div>
+      <div class="budget-bar"><div class="budget-bar-fill green" style="width: 0%" id="flightBudgetBar"></div></div>
+    </div>
+    <div class="budget-card">
+      <h3>Accommodation Budget</h3>
+      <div class="amount">EUR 2,000 <small>/ 11 nights</small></div>
+      <div class="budget-bar"><div class="budget-bar-fill green" style="width: 0%" id="accBudgetBar"></div></div>
+    </div>
+    <div class="budget-card">
+      <h3>Total Budget</h3>
+      <div class="amount">EUR 8,000 <small>combined</small></div>
+      <div class="budget-bar"><div class="budget-bar-fill green" style="width: 0%" id="totalBudgetBar"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-container">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('flights', this)">Flights <span class="count" id="flightsCount">7</span></button>
+    <button class="tab" onclick="switchTab('accommodation', this)">Stays <span class="count" id="staysCount">12</span></button>
+    <button class="tab" onclick="switchTab('saved', this)">Saved <span class="count" id="savedTabCount">0</span></button>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- FLIGHTS TAB -->
+  <div class="tab-content active" id="tab-flights">
+    <div class="section-header">
+      <h2>Flight Options: Amsterdam to Curacao</h2>
+      <div class="filter-pills">
+        <button class="pill active" onclick="filterFlights('all', this)">All</button>
+        <button class="pill" onclick="filterFlights('direct', this)">Direct only</button>
+        <button class="pill" onclick="filterFlights('budget', this)">Within budget</button>
+      </div>
+    </div>
+    <div id="flightsList"></div>
+    <p style="font-size:13px;color:#888;margin-top:16px;">
+      Prices are indicative based on research as of today. Actual prices may vary.
+      Team is actively searching for better deals across Google Flights, Skyscanner, KLM.com, TUI.nl, Corendon, and Cheaptickets.nl.
+    </p>
+  </div>
+
+  <!-- ACCOMMODATION TAB -->
+  <div class="tab-content" id="tab-accommodation">
+    <div class="section-header">
+      <h2>Accommodation Options in Curacao</h2>
+      <div class="filter-pills">
+        <button class="pill active" onclick="filterAcc('all', this)">All</button>
+        <button class="pill" onclick="filterAcc('budget', this)">Within EUR 2K</button>
+        <button class="pill" onclick="filterAcc('resort', this)">Resorts</button>
+        <button class="pill" onclick="filterAcc('villa', this)">Villas</button>
+      </div>
+    </div>
+    <div class="acc-grid" id="accGrid"></div>
+  </div>
+
+  <!-- SAVED TAB -->
+  <div class="tab-content" id="tab-saved">
+    <div class="section-header">
+      <h2>Your Saved Options</h2>
+    </div>
+    <div id="savedList">
+      <p style="color:#999;text-align:center;padding:40px;">Click the star on any flight or stay to save it here.</p>
+    </div>
+  </div>
+</div>
+
+<div class="last-updated">
+  <span class="pulse"></span> Last updated: <span id="lastUpdated"></span> | Research ongoing by Travel Hacker, Travel Specialist, Continuous Researcher &amp; Travel Influencer
+</div>
+
+<!-- SAVED PANEL -->
+<div class="overlay" id="overlay" onclick="toggleSavedPanel()"></div>
+<div class="saved-panel" id="savedPanel">
+  <div class="saved-panel-header">
+    <h2>Saved Selections</h2>
+    <button class="saved-panel-close" onclick="toggleSavedPanel()">&times;</button>
+  </div>
+  <div class="saved-panel-body" id="savedPanelBody">
+    <p style="color:#999;text-align:center;padding:20px;">No saved items yet</p>
+  </div>
+  <div class="saved-total" id="savedTotal" style="display:none;">
+    <div class="saved-total-line"><span>Flights (selected)</span><span id="savedFlightTotal">EUR 0</span></div>
+    <div class="saved-total-line"><span>Stay (selected)</span><span id="savedAccTotal">EUR 0</span></div>
+    <div class="saved-total-line grand"><span>Estimated Total</span><span id="savedGrandTotal">EUR 0</span></div>
+  </div>
+</div>
+
+<script>
+const flights = [
+  {
+    id: 'f1', airline: 'TUI fly', airlineClass: 'airline-tui', airlineCode: 'TUI',
+    outDate: 'Wed, Apr 16', outDepart: '10:15', outArrive: '14:30', outDuration: '9h 15m',
+    retDate: 'Sat, Apr 26', retDepart: '16:45', retArrive: '07:10+1', retDuration: '9h 25m',
+    stops: 'Direct', pricePerPerson: 589, totalPrice: 2945, source: 'TUI.nl', deal: true,
+    type: 'direct', link: 'https://www.tui.nl/vliegtickets/'
+  },
+  {
+    id: 'f2', airline: 'TUI fly', airlineClass: 'airline-tui', airlineCode: 'TUI',
+    outDate: 'Tue, Apr 15', outDepart: '10:15', outArrive: '14:30', outDuration: '9h 15m',
+    retDate: 'Sat, Apr 26', retDepart: '16:45', retArrive: '07:10+1', retDuration: '9h 25m',
+    stops: 'Direct', pricePerPerson: 599, totalPrice: 2995, source: 'TUI.nl', deal: true,
+    type: 'direct', link: 'https://www.tui.nl/vliegtickets/'
+  },
+  {
+    id: 'f5', airline: 'Corendon', airlineClass: 'airline-corendon', airlineCode: 'COR',
+    outDate: 'Wed, Apr 16', outDepart: '11:30', outArrive: '15:50', outDuration: '9h 20m',
+    retDate: 'Sat, Apr 26', retDepart: '17:30', retArrive: '08:05+1', retDuration: '9h 35m',
+    stops: 'Direct', pricePerPerson: 629, totalPrice: 3145, source: 'Corendon.nl', deal: false,
+    type: 'direct', link: 'https://www.corendon.com/en/ticket-curacao'
+  },
+  {
+    id: 'f5b', airline: 'Corendon', airlineClass: 'airline-corendon', airlineCode: 'COR',
+    outDate: 'Tue, Apr 15', outDepart: '11:30', outArrive: '15:50', outDuration: '9h 20m',
+    retDate: 'Sat, Apr 26', retDepart: '17:30', retArrive: '08:05+1', retDuration: '9h 35m',
+    stops: 'Direct', pricePerPerson: 639, totalPrice: 3195, source: 'Corendon.nl', deal: false,
+    type: 'direct', link: 'https://www.corendon.com/en/ticket-curacao'
+  },
+  {
+    id: 'f3', airline: 'KLM', airlineClass: 'airline-klm', airlineCode: 'KLM',
+    outDate: 'Wed, Apr 16', outDepart: '14:55', outArrive: '19:15', outDuration: '9h 20m',
+    retDate: 'Sat, Apr 26', retDepart: '21:10', retArrive: '11:45+1', retDuration: '9h 35m',
+    stops: 'Direct', pricePerPerson: 765, totalPrice: 3825, source: 'KLM.nl', deal: false,
+    type: 'direct', link: 'https://www.klm.nl/en-nl/flights-from-amsterdam-to-curacao'
+  },
+  {
+    id: 'f4', airline: 'KLM', airlineClass: 'airline-klm', airlineCode: 'KLM',
+    outDate: 'Tue, Apr 15', outDepart: '14:55', outArrive: '19:15', outDuration: '9h 20m',
+    retDate: 'Sat, Apr 26', retDepart: '21:10', retArrive: '11:45+1', retDuration: '9h 35m',
+    stops: 'Direct', pricePerPerson: 789, totalPrice: 3945, source: 'KLM.nl', deal: false,
+    type: 'direct', link: 'https://www.klm.nl/en-nl/flights-from-amsterdam-to-curacao'
+  },
+  {
+    id: 'f6', airline: 'KLM', airlineClass: 'airline-klm', airlineCode: 'KLM',
+    outDate: 'Tue, Apr 15', outDepart: '09:40', outArrive: '18:20', outDuration: '13h 40m',
+    retDate: 'Sat, Apr 26', retDepart: '08:00', retArrive: '06:30+1', retDuration: '16h 30m',
+    stops: '1 stop (BON)', pricePerPerson: 680, totalPrice: 3400, source: 'Google Flights', deal: false,
+    type: 'connection', link: 'https://www.google.com/travel/flights'
+  }
+];
+
+const accommodations = [
+  {
+    id: 'a1', name: 'Luxury Apartment - Ocean View & Pool',
+    location: 'Willemstad, 5.2mi to center', pricePerNight: 154, totalPrice: 1692,
+    rating: 9.8, reviews: 368, source: 'Vrbo',
+    image: 'https://imgcy.trivago.com/c_fill,d_dummy.jpeg,e_sharpen:60,f_auto,h_534,q_40,w_800//hotelier-images/e4/34/b5ea82c1da35850b5dc4fd22f4945e50899ab110c7754c0c73bfa4f5d4c3',
+    amenities: ['Pool', 'WiFi', 'Kitchen', 'A/C', 'Beach nearby', 'Parking'],
+    type: 'villa', withinBudget: true,
+    link: 'https://www.trivago.com/en-US/oar/entire-house-apartment-luxusapartment-mit-meerblick-pool-strandnah-sehr-tropisch-deutsche-verwaltung-willemstad?search=100-9944992;dr-20260415-20260426;rc-1-3-6-6&cip=234716015'
+  },
+  {
+    id: 'a11', name: 'Cattleya Apartments',
+    location: 'Willemstad, Curacao', pricePerNight: 171, totalPrice: 1885,
+    rating: 8.6, reviews: 45, source: 'Booking.com',
+    image: 'https://imgcy.trivago.com/c_fill,d_dummy.jpeg,e_sharpen:60,f_auto,h_534,q_40,w_800//partner-images/51/9e/b70feb73c141f25b5f2014e6f4ec29a76a0d0521f08a95a3e65783052849',
+    amenities: ['Pool', 'WiFi', 'Kitchen', 'A/C', 'Parking', 'Garden'],
+    type: 'villa', withinBudget: true,
+    link: 'https://www.booking.com/searchresults.html?ss=Curacao'
+  },
+  {
+    id: 'a12', name: 'Freedom Hotel Curacao',
+    location: 'Willemstad, Curacao', pricePerNight: 179, totalPrice: 1974,
+    rating: 8.1, reviews: 120, source: 'Trivago',
+    image: 'https://imgcy.trivago.com/c_fill,d_dummy.jpeg,e_sharpen:60,f_auto,h_534,q_40,w_800//partner-images/88/88/75f15f93365afa47557737be4db6b017a80c1c9236ca200a431997ad0374',
+    amenities: ['Pool', 'WiFi', 'Restaurant', 'A/C', 'Bar', 'Parking'],
+    type: 'resort', withinBudget: true,
+    link: 'https://www.trivago.com/en-US/oar/freedom-hotel-curacao-willemstad'
+  },
+  {
+    id: 'a2', name: 'Live Like a Local + Shared Pool',
+    location: 'Willemstad, 4.5mi to center', pricePerNight: 182, totalPrice: 2006,
+    rating: 9.8, reviews: 17, source: 'Airbnb',
+    image: 'https://imgcy.trivago.com/c_fill,d_dummy.jpeg,e_sharpen:60,f_auto,h_534,q_40,w_800//partner-images/51/9e/b70feb73c141f25b5f2014e6f4ec29a76a0d0521f08a95a3e65783052849',
+    amenities: ['Pool', 'WiFi', 'Kitchen', 'A/C', 'Parking', 'Washer'],
+    type: 'villa', withinBudget: true,
+    link: 'https://www.trivago.com/en-US/oar/entire-house-apartment-last-minutes-live-like-a-local-and-shared-pool-willemstad?search=100-50046802;dr-20260415-20260426;rc-1-3-6-6&cip=234716015'
+  },
+  {
+    id: 'a3', name: 'Sirena Resort Curacao',
+    location: 'Willemstad, 4.7mi to center', pricePerNight: 191, totalPrice: 2096,
+    rating: 9.0, reviews: 225, source: 'Hotels.com',
+    image: 'https://imgcy.trivago.com/c_fill,d_dummy.jpeg,e_sharpen:60,f_auto,h_534,q_40,w_800//partner-images/1c/55/23a2f27fcd57447142d1d14fa4eca1ea6589f563f8cde63937f6364efe10',
+    amenities: ['Pool', 'Spa', 'WiFi', 'Restaurant', 'Bar', 'Gym'],
+    type: 'resort', withinBudget: false,
+    link: 'https://www.trivago.com/en-US/oar/serviced-apartment-sirena-resort-curaçao-willemstad?search=100-17949966;dr-20260415-20260426;rc-1-3-6-6&cip=234716015'
+  },
+  {
+    id: 'a4', name: 'O Casarao Guesthouse',
+    location: 'Willemstad, 1.7mi to center', pricePerNight: 196, totalPrice: 2151,
+    rating: 9.3, reviews: 198, source: 'eDreams',
+    image: 'https://imgcy.trivago.com/c_fill,d_dummy.jpeg,e_sharpen:60,f_auto,h_534,q_40,w_800//partner-images/18/00/64ae3abe3426110866210b2f3c12102d66cc01925abf66de5cf290c550bf',
+    amenities: ['Pool', 'WiFi', 'Kitchen', 'A/C', 'Parking', 'Terrace'],
+    type: 'villa', withinBudget: false,
+    link: 'https://www.trivago.com/en-US/oar/bed-breakfast-o-casarao-guesthouse-willemstad?search=100-3939742;dr-20260415-20260426;rc-1-3-6-6&cip=234716015'
+  },
+  {
+    id: 'a5', name: 'Piscadera Harbour Village',
+    location: 'Willemstad, 2.6mi to center', pricePerNight: 218, totalPrice: 2402,
+    rating: 8.7, reviews: 501, source: 'eDreams',
+    image: 'https://imgcy.trivago.com/c_fill,d_dummy.jpeg,e_sharpen:60,f_auto,h_534,q_40,w_800//partner-images/98/59/4765d0f46f9b4f5f6bf3e3f14b33014a99e48b9d0cf472059ef85f50a89c',
+    amenities: ['Pool', 'WiFi', 'Restaurant', 'A/C', 'Parking', 'Bar'],
+    type: 'resort', withinBudget: false,
+    link: 'https://www.trivago.com/en-US/oar/hotel-piscadera-harbour-village-willemstad?search=100-2281284;dr-20260415-20260426;rc-1-3-6-6&cip=234716015'
+  },
+  {
+    id: 'a6', name: 'Mountain View Villa + Private Pool (6 pax)',
+    location: 'Willemstad, 4.9mi to center', pricePerNight: 230, totalPrice: 2527,
+    rating: 9.3, reviews: 15, source: 'Airbnb',
+    image: 'https://imgcy.trivago.com/c_fill,d_dummy.jpeg,e_sharpen:60,f_auto,h_534,q_40,w_800//partner-images/1c/34/07e0c9c7554f7c730f1ca88dafa3227ae6e858c7d0010a92862a0318c957',
+    amenities: ['Private Pool', 'WiFi', 'Kitchen', 'A/C', '6 guests', 'Terrace'],
+    type: 'villa', withinBudget: false,
+    link: 'https://www.trivago.com/en-US/oar/entire-house-apartment-mountain-view-villa-private-pool-6-people-willemstad?search=100-50080068;dr-20260415-20260426;rc-1-3-6-6&cip=234716015'
+  },
+  {
+    id: 'a7', name: 'POCO POCO Villa - Golf & Beach Resort',
+    location: 'Willemstad, 4.0mi to center', pricePerNight: 233, totalPrice: 2566,
+    rating: 8.9, reviews: 79, source: 'Airbnb',
+    image: 'https://imgcy.trivago.com/c_fill,d_dummy.jpeg,e_sharpen:60,f_auto,h_534,q_40,w_800//partner-images/88/88/75f15f93365afa47557737be4db6b017a80c1c9236ca200a431997ad0374',
+    amenities: ['Pool', 'Golf', 'WiFi', 'Kitchen', 'A/C', 'Beach'],
+    type: 'villa', withinBudget: false,
+    link: 'https://www.trivago.com/en-US/oar/entire-house-apartment-poco-poco-villa-poolside-golf-beach-resort-willemstad?search=100-50396100;dr-20260415-20260426;rc-1-3-6-6&cip=234716015'
+  },
+  {
+    id: 'a8', name: 'Palapa Beach Resort',
+    location: 'Willemstad, 4.8mi to center', pricePerNight: 258, totalPrice: 2833,
+    rating: 8.9, reviews: 259, source: 'eDreams',
+    image: 'https://imgcy.trivago.com/c_fill,d_dummy.jpeg,e_sharpen:60,f_auto,h_534,q_40,w_800//hotelier-images/95/6f/1c50dd847e4acdc863edf1d760c2298b63e7d2b9d0df0d020665a671c197',
+    amenities: ['Beach', 'Pool', 'Spa', 'Restaurant', 'WiFi', 'A/C'],
+    type: 'resort', withinBudget: false,
+    link: 'https://www.trivago.com/en-US/oar/palapa-beach-resort-willemstad?search=100-4720228;dr-20260415-20260426;rc-1-3-6-6&cip=234716015'
+  },
+  {
+    id: 'a9', name: 'Villa Jan Thiel + Private Pool',
+    location: 'Jan Thiel, Willemstad', pricePerNight: 258, totalPrice: 2836,
+    rating: 9.4, reviews: 5, source: 'Airbnb',
+    image: 'https://imgcy.trivago.com/c_fill,d_dummy.jpeg,e_sharpen:60,f_auto,h_534,q_40,w_800//partner-images/37/7c/915b983f6be039de35856091a95d0f8e93eab26a7513092628e7d166a5db',
+    amenities: ['Private Pool', 'WiFi', 'Kitchen', 'A/C', 'Parking', 'Washer'],
+    type: 'villa', withinBudget: false,
+    link: 'https://www.trivago.com/en-US/oar/entire-house-apartment-villa-in-jan-thiel-with-private-pool-willemstad?search=100-49998490;dr-20260415-20260426;rc-1-3-6-6&cip=234716015'
+  },
+  {
+    id: 'a10', name: 'Zen City - Luxury 3BR Grand Villa + Pool',
+    location: 'Willemstad, 2.1mi to center', pricePerNight: 322, totalPrice: 3541,
+    rating: 9.6, reviews: 9, source: 'Airbnb',
+    image: 'https://imgcy.trivago.com/c_fill,d_dummy.jpeg,e_sharpen:60,f_auto,h_534,q_40,w_800//partner-images/2b/b8/1f00cc8a22656110b8b012ef2420b1b775f51039f286dc832509823c77f7',
+    amenities: ['Private Pool', 'WiFi', 'Kitchen', 'A/C', '3 Bedrooms', 'Luxury'],
+    type: 'villa', withinBudget: false,
+    link: 'https://www.trivago.com/en-US/oar/entire-house-apartment-zen-city-luxury-3-bedroom-grand-villa-with-pool-willemstad?search=100-49216338;dr-20260415-20260426;rc-1-3-6-6&cip=234716015'
+  }
+];
+
+// STATE
+let saved = JSON.parse(localStorage.getItem('curacao2025_saved') || '{}');
+let currentFlightFilter = 'all';
+let currentAccFilter = 'all';
+
+function renderFlights(filter) {
+  if (filter === undefined) filter = currentFlightFilter;
+  const list = document.getElementById('flightsList');
+  let filtered = flights;
+  if (filter === 'direct') filtered = flights.filter(f => f.type === 'direct');
+  if (filter === 'budget') filtered = flights.filter(f => f.totalPrice <= 6000);
+
+  list.innerHTML = filtered.map(f => `
+    <div class="flight-card ${saved[f.id] ? 'saved' : ''}" id="card-${f.id}">
+      ${f.deal ? '<div class="deal-tag">Best Deal</div>' : ''}
+      <div class="flight-info">
+        <div class="flight-airline">
+          <div class="airline-logo ${f.airlineClass}">${f.airlineCode}</div>
+          ${f.airline} &middot; ${f.stops}
+        </div>
+        <div class="flight-route">
+          <div><div class="flight-time">${f.outDepart}</div><div class="flight-airport">AMS</div></div>
+          <div class="flight-duration"><span>${f.outDuration}</span><div class="line"></div><span>${f.outDate}</span></div>
+          <div><div class="flight-time">${f.outArrive}</div><div class="flight-airport">CUR</div></div>
+        </div>
+        <div class="flight-route">
+          <div><div class="flight-time">${f.retDepart}</div><div class="flight-airport">CUR</div></div>
+          <div class="flight-duration"><span>${f.retDuration}</span><div class="line"></div><span>${f.retDate}</span></div>
+          <div><div class="flight-time">${f.retArrive}</div><div class="flight-airport">AMS</div></div>
+        </div>
+        <a class="view-link" href="${f.link}" target="_blank">View on ${f.source} &rarr;</a>
+      </div>
+      <div class="flight-price-box">
+        <div class="pp">per person</div>
+        <div class="price">&euro;${f.pricePerPerson.toLocaleString()}</div>
+        <div class="total">&euro;${f.totalPrice.toLocaleString()} total (5 pax)</div>
+      </div>
+      <div class="flight-actions">
+        <button class="star-btn ${saved[f.id] ? 'saved' : ''}" onclick="toggleSave('${f.id}', 'flight')">${saved[f.id] ? '\u2605' : '\u2606'}</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderAccommodations(filter) {
+  if (filter === undefined) filter = currentAccFilter;
+  const grid = document.getElementById('accGrid');
+  let filtered = accommodations;
+  if (filter === 'budget') filtered = accommodations.filter(a => a.totalPrice <= 2000);
+  if (filter === 'resort') filtered = accommodations.filter(a => a.type === 'resort');
+  if (filter === 'villa') filtered = accommodations.filter(a => a.type === 'villa');
+
+  grid.innerHTML = filtered.map(a => `
+    <div class="acc-card ${saved[a.id] ? 'saved' : ''}" id="card-${a.id}">
+      <button class="acc-star-btn ${saved[a.id] ? 'saved' : ''}" onclick="toggleSave('${a.id}', 'acc')">${saved[a.id] ? '\u2605' : '\u2606'}</button>
+      <div class="budget-tag ${a.withinBudget ? 'within' : 'over'}">${a.withinBudget ? 'Within budget' : 'Over budget'}</div>
+      <img class="acc-card-img" src="${a.image}" alt="${a.name}" loading="lazy" onerror="this.style.background='linear-gradient(135deg,#e8ecf1,#d0d5dd)'">
+      <div class="acc-card-body">
+        <h3 title="${a.name}">${a.name}</h3>
+        <div class="acc-card-location">${a.location}</div>
+        <div class="acc-card-rating">
+          <span class="rating-badge">${a.rating}</span>
+          <span class="rating-text">${a.rating >= 9.5 ? 'Exceptional' : a.rating >= 9 ? 'Excellent' : a.rating >= 8.5 ? 'Very Good' : 'Good'} &middot; ${a.reviews} reviews</span>
+        </div>
+        <div class="acc-amenities">
+          ${a.amenities.slice(0, 5).map(am => '<span class="amenity-tag">' + am + '</span>').join('')}
+        </div>
+        <div class="acc-card-footer">
+          <div class="acc-price-info">
+            <div class="per-night">per night</div>
+            <div class="price">&euro;${a.pricePerNight}</div>
+            <div class="total">&euro;${a.totalPrice.toLocaleString()} total (11 nights)</div>
+          </div>
+          <a class="acc-source" href="${a.link}" target="_blank">${a.source} &rarr;</a>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleSave(id, type) {
+  if (saved[id]) {
+    delete saved[id];
+  } else {
+    const item = type === 'flight'
+      ? flights.find(f => f.id === id)
+      : accommodations.find(a => a.id === id);
+    saved[id] = { type, ...item };
+  }
+  localStorage.setItem('curacao2025_saved', JSON.stringify(saved));
+  updateUI();
+}
+
+function updateUI() {
+  renderFlights();
+  renderAccommodations();
+  updateSavedCount();
+  updateSavedPanel();
+  updateSavedTab();
+  updateBudgetBars();
+}
+
+function updateSavedCount() {
+  const count = Object.keys(saved).length;
+  document.getElementById('savedCount').textContent = count;
+  document.getElementById('savedTabCount').textContent = count;
+}
+
+function updateSavedPanel() {
+  const body = document.getElementById('savedPanelBody');
+  const entries = Object.entries(saved);
+  if (entries.length === 0) {
+    body.innerHTML = '<p style="color:#999;text-align:center;padding:20px;">No saved items yet</p>';
+    document.getElementById('savedTotal').style.display = 'none';
+    return;
+  }
+  body.innerHTML = entries.map(([id, item]) => `
+    <div class="saved-item">
+      <div class="saved-item-info">
+        <h4>${item.type === 'flight' ? item.airline + ' ' + item.outDate : item.name}</h4>
+        <p>${item.type === 'flight' ? '\u20ac' + item.totalPrice.toLocaleString() + ' (5 pax)' : '\u20ac' + item.totalPrice.toLocaleString() + ' (11 nights)'}</p>
+      </div>
+      <button class="saved-item-remove" onclick="toggleSave('${id}', '${item.type}')">&times;</button>
+    </div>
+  `).join('');
+
+  let flightTotal = 0, accTotal = 0;
+  entries.forEach(([, item]) => {
+    if (item.type === 'flight') flightTotal += item.totalPrice;
+    else accTotal += item.totalPrice;
+  });
+  document.getElementById('savedFlightTotal').textContent = '\u20ac' + flightTotal.toLocaleString();
+  document.getElementById('savedAccTotal').textContent = '\u20ac' + accTotal.toLocaleString();
+  document.getElementById('savedGrandTotal').textContent = '\u20ac' + (flightTotal + accTotal).toLocaleString();
+  document.getElementById('savedTotal').style.display = 'block';
+}
+
+function updateSavedTab() {
+  const list = document.getElementById('savedList');
+  const entries = Object.entries(saved);
+  if (entries.length === 0) {
+    list.innerHTML = '<p style="color:#999;text-align:center;padding:40px;">Click the star on any flight or stay to save it here.</p>';
+    return;
+  }
+  const sf = entries.filter(([,i]) => i.type === 'flight');
+  const sa = entries.filter(([,i]) => i.type === 'acc');
+  let html = '';
+  if (sf.length) {
+    html += '<h3 style="margin-bottom:12px;">Saved Flights</h3>';
+    sf.forEach(([id, item]) => {
+      html += `<div class="flight-card saved" style="margin-bottom:12px;">
+        <div class="flight-info">
+          <div class="flight-airline"><div class="airline-logo ${item.airlineClass}">${item.airlineCode}</div>${item.airline} &middot; ${item.stops}</div>
+          <div>${item.outDate}: ${item.outDepart} &rarr; ${item.outArrive} | ${item.retDate}: ${item.retDepart} &rarr; ${item.retArrive}</div>
+        </div>
+        <div class="flight-price-box"><div class="price">&euro;${item.pricePerPerson.toLocaleString()}/pp</div><div class="total">&euro;${item.totalPrice.toLocaleString()} total</div></div>
+        <div class="flight-actions"><button class="star-btn saved" onclick="toggleSave('${id}', 'flight')">\u2605</button></div>
+      </div>`;
+    });
+  }
+  if (sa.length) {
+    html += '<h3 style="margin:20px 0 12px;">Saved Stays</h3><div class="acc-grid">';
+    sa.forEach(([id, item]) => {
+      html += `<div class="acc-card saved">
+        <button class="acc-star-btn saved" onclick="toggleSave('${id}', 'acc')">\u2605</button>
+        <img class="acc-card-img" src="${item.image}" alt="${item.name}" onerror="this.style.background='#e8ecf1'">
+        <div class="acc-card-body"><h3>${item.name}</h3><div class="acc-card-location">${item.location}</div>
+        <div class="acc-card-footer"><div class="acc-price-info"><div class="price">&euro;${item.pricePerNight}/night</div><div class="total">&euro;${item.totalPrice.toLocaleString()} total</div></div></div></div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+  let ft = 0, at = 0;
+  entries.forEach(([,i]) => { if (i.type==='flight') ft += i.totalPrice; else at += i.totalPrice; });
+  const over = (ft+at) > 8000;
+  html += `<div style="margin-top:24px;padding:16px;background:var(--bg-light);border-radius:8px;">
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span>Flights</span><strong>&euro;${ft.toLocaleString()}</strong></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span>Stay</span><strong>&euro;${at.toLocaleString()}</strong></div>
+    <div style="display:flex;justify-content:space-between;padding-top:8px;border-top:2px solid var(--klm-dark);font-size:18px;font-weight:800;">
+      <span>Total</span><span style="color:${over ? '#e74c3c' : 'var(--accent-green)'}">&euro;${(ft+at).toLocaleString()}</span>
+    </div>
+    <div style="font-size:12px;color:#888;margin-top:4px;">Budget: &euro;8,000 | ${over ? 'Over budget by &euro;' + ((ft+at)-8000).toLocaleString() : 'Within budget'}</div>
+  </div>`;
+  list.innerHTML = html;
+}
+
+function updateBudgetBars() {
+  const entries = Object.values(saved);
+  let ft = 0, at = 0;
+  entries.forEach(i => { if (i.type==='flight') ft += i.totalPrice; else at += i.totalPrice; });
+  setBudgetBar('flightBudgetBar', ft, 6000);
+  setBudgetBar('accBudgetBar', at, 2000);
+  setBudgetBar('totalBudgetBar', ft + at, 8000);
+}
+
+function setBudgetBar(id, value, max) {
+  const el = document.getElementById(id);
+  const pct = Math.min((value / max) * 100, 100);
+  el.style.width = pct + '%';
+  el.className = 'budget-bar-fill ' + (pct > 90 ? 'red' : pct > 70 ? 'orange' : 'green');
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'saved') updateSavedTab();
+}
+
+function filterFlights(filter, btn) {
+  currentFlightFilter = filter;
+  document.querySelectorAll('#tab-flights .pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderFlights(filter);
+}
+
+function filterAcc(filter, btn) {
+  currentAccFilter = filter;
+  document.querySelectorAll('#tab-accommodation .pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderAccommodations(filter);
+}
+
+function toggleSavedPanel() {
+  document.getElementById('savedPanel').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+
+// INIT
+document.getElementById('lastUpdated').textContent = new Date().toLocaleString('en-GB', {
+  day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+});
+renderFlights();
+renderAccommodations();
+updateSavedCount();
+updateBudgetBars();
+</script>
+</body>
+</html>
